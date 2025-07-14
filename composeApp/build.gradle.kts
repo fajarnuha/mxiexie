@@ -43,6 +43,8 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+            implementation("io.github.g0dkar:qrcode-kotlin:4.5.0")
+
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
