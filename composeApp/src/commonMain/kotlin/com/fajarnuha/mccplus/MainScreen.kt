@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -88,7 +89,7 @@ fun MainScreen(viewModel: MainViewModel = viewModel { MainViewModel() }) {
                             painter = sampleImagePainter,
                             contentDescription = "Descriptive text for the image", // Important for accessibility
                             modifier = Modifier
-                                .fillMaxWidth()
+                                .size(120.dp)
                                 .weight(1f) // Takes up available vertical space above chips
                                 .padding(16.dp),
                             contentScale = ContentScale.Fit // Or ContentScale.Crop, etc.
@@ -98,7 +99,7 @@ fun MainScreen(viewModel: MainViewModel = viewModel { MainViewModel() }) {
                             bitmap = img!!,
                             contentDescription = "Descriptive text for the image", // Important for accessibility
                             modifier = Modifier
-                                .size(240.dp)
+                                .size(280.dp)
                                 .weight(1f) // Takes up available vertical space above chips
                                 .padding(16.dp),
                             contentScale = ContentScale.Fit // Or ContentScale.Crop, etc.
@@ -125,7 +126,7 @@ fun MainScreen(viewModel: MainViewModel = viewModel { MainViewModel() }) {
                             FilterChip(
                                 selected = (option.id == selectedChip),
                                 onClick = { viewModel.updateSelectedId(option.id) },
-                                label = { Text(option.name) },
+                                label = { Text(option.name, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold) },
                                 shape = MaterialTheme.shapes.medium,
                                 colors = FilterChipDefaults.filterChipColors(
                                     selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
