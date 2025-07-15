@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.serialization)
 }
 
 kotlin {
@@ -33,6 +34,8 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation("io.ktor:ktor-client-android:2.3.8")
+            implementation(libs.kotlinx.coroutines.android)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -45,9 +48,20 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation("io.github.g0dkar:qrcode-kotlin:4.5.0")
 
+            implementation("io.ktor:ktor-client-core:2.3.8")
+            // Ktor Content Negotiation (for serialization/deserialization)
+            implementation("io.ktor:ktor-client-content-negotiation:2.3.8")
+            implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.9.1")
+            // Kotlinx Serialization for JSON
+            implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.8")
+            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
+            implementation(libs.kotlinx.coroutines.core)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+        }
+        iosMain.dependencies {
+            implementation("io.ktor:ktor-client-darwin:2.3.8")
         }
     }
 }
