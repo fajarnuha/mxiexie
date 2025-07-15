@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -52,7 +53,8 @@ fun LoginScreen(onSuccess: () -> Unit) {
                 singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 16.dp)
+                    .padding(bottom = 16.dp, start = 16.dp, end = 16.dp, top = 0.dp),
+                shape = RoundedCornerShape(12.dp)
             )
 
             OutlinedTextField(
@@ -64,14 +66,15 @@ fun LoginScreen(onSuccess: () -> Unit) {
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 32.dp)
+                    .padding(bottom = 32.dp, start = 16.dp, end = 16.dp, top = 0.dp),
+                shape = RoundedCornerShape(12.dp)
             )
 
             Button(
                 onClick = {
                     onSuccess()
                 },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                 shape = MaterialTheme.shapes.medium
             ) {
                 Text("Log In")
