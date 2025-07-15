@@ -1,20 +1,37 @@
 package com.fajarnuha.mccplus
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.fajarnuha.mccplus.data.local.SettingsRepository
+import com.fajarnuha.mccplus.data.local.createDataStore
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
-class MainViewModel: ViewModel() {
+class MainViewModel(
+    private val settingsRepository: SettingsRepository = SettingsRepository(createDataStore())
+): ViewModel() {
 
     private val _uiState = MutableStateFlow<UiModel>(Loading)
     val uiState = _uiState
 
     fun fetch() {
-        val response = mockData()
-        _uiState.value = Content.from(response)
+        viewModelScope.launch {
+            val response = mockData()
+            val accessItems = Content.from(response)
+            val savedId = settingsRepository.getSelectedAccess()
+            val selectedId = accessItems.access.firstOrNull { it.id == savedId }?.id ?: accessItems.access.first().id
+            _uiState.value = accessItems.copy(selectedId = selectedId)
+        }
     }
 
     fun updateSelectedId(id: String) {
-        _uiState.value = (_uiState.value as Content).copy(selectedId = id)
+        viewModelScope.launch {
+            (_uiState.value as? Content)?.let {
+                _uiState.value = it.copy(selectedId = id)
+                settingsRepository.setSelectedAccess(id)
+            }
+        }
     }
 
 }
@@ -25,7 +42,7 @@ object Loading: UiModel
 
 data class Content(
     val access: List<Access>,
-    val selectedId: String = access.first().id
+    val selectedId: String? = null
 ): UiModel {
     data class Access(
         val id: String,

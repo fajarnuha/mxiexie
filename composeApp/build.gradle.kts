@@ -56,6 +56,7 @@ kotlin {
             implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.8")
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
             implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.androidx.datastore.preferences)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
