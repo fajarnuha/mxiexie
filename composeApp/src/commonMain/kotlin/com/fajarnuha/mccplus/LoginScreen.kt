@@ -13,6 +13,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,13 +23,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
-fun LoginScreen(onSuccess: () -> Unit) {
+fun LoginScreen(onSuccess: () -> Unit, viewModel: LoginViewModel = viewModel { LoginViewModel() }) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
+    // This block listens for effects from the ViewModel
+    LaunchedEffect(Unit) {
+        viewModel.loginEffect.collect { effect ->
+            when (effect) {
+                is LoginEffect.NavigateToMain -> {
+                    // Handle navigation
+                    onSuccess()
+                }
+                is LoginEffect.ShowErrorToast -> {
+                    // Handle showing a toast
+                }
+            }
+        }
+    }
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
@@ -72,7 +88,7 @@ fun LoginScreen(onSuccess: () -> Unit) {
 
             Button(
                 onClick = {
-                    onSuccess()
+                    viewModel.login(username, password)
                 },
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                 shape = MaterialTheme.shapes.medium

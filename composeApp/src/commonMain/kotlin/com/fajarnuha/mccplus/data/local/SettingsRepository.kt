@@ -28,9 +28,12 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
         }.first()
     }
 
-    suspend fun setToken(value: String) {
+    fun getTokenFlow() = dataStore.data.map { it[token] }
+
+    suspend fun setToken(value: String?) {
         dataStore.edit { preferences ->
-            preferences[token] = value
+            if (value == null) preferences.remove(token)
+            else preferences[token] = value
         }
     }
 
