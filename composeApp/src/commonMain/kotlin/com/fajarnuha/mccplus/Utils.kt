@@ -3,6 +3,9 @@ package com.fajarnuha.mccplus
 import androidx.compose.ui.graphics.ImageBitmap
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.format.DateTimeComponents
+import kotlinx.datetime.toInstant
 
 expect fun imageBitmapFromBytes(bytes: ByteArray): ImageBitmap
 
@@ -30,7 +33,7 @@ object TimeUtils {
         return try {
             // Parse the string directly into an Instant.
             // Instant.parse() handles the ISO 8601 format automatically.
-            val validityInstant = Instant.parse(validityString)
+            val validityInstant = Instant.parse("${validityString}Z")
 
             // Get the current system time as an Instant.
             val now = Clock.System.now()
