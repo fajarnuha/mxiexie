@@ -132,7 +132,7 @@ fun MainScreen(viewModel: MainViewModel = viewModel { MainViewModel() }) {
                     FlowRow(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 12.dp, vertical = 48.dp),
+                            .padding(horizontal = 24.dp, vertical = 48.dp),
                         horizontalArrangement = Arrangement.SpaceAround, // Spacing between items in the same line
                         verticalArrangement = Arrangement.spacedBy(8.dp) // Spacing between lines
                     ) {
