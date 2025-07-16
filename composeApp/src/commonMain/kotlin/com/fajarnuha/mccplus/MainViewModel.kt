@@ -26,7 +26,7 @@ class MainViewModel(
             if (response.isFailure) return@launch
             val accessList = response.getOrNull()!!.accessDataList
 //            val accessList = mockData()
-            val accessItems = Content.from(accessList)
+            val accessItems = Content.from(accessList.sortedBy { it.description })
             val savedId = settingsRepository.getSelectedAccess()
             val selectedId = accessItems.access.firstOrNull { it.id == savedId }?.id
                 ?: accessItems.access.first().id

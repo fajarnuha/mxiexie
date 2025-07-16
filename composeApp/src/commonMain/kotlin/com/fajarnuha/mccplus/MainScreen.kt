@@ -1,5 +1,7 @@
 package com.fajarnuha.mccplus
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -31,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -119,9 +122,8 @@ fun MainScreen(viewModel: MainViewModel = viewModel { MainViewModel() }) {
                     }
 
 
-                    // Chip selection at the bottom
                     Text(
-                        text = "Choose access:",
+                        text = "",
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier
                     )
@@ -130,11 +132,17 @@ fun MainScreen(viewModel: MainViewModel = viewModel { MainViewModel() }) {
                     FlowRow(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 24.dp, vertical = 24.dp),
+                            .padding(horizontal = 12.dp, vertical = 48.dp),
                         horizontalArrangement = Arrangement.SpaceAround, // Spacing between items in the same line
-                        verticalArrangement = Arrangement.spacedBy(2.dp) // Spacing between lines
+                        verticalArrangement = Arrangement.spacedBy(8.dp) // Spacing between lines
                     ) {
                         sampleChipOptions.forEach { option -> // Iterate using forEach for FlowRow
+                            val targetScale = if (option.id == selectedChip) 1.1f else 1.0f
+                            val animatedScale by animateFloatAsState(
+                                targetValue = targetScale,
+                                animationSpec = tween(durationMillis = 100), // Adjust duration as needed
+                                label = "chipScale"
+                            )
                             FilterChip(
                                 selected = (option.id == selectedChip),
                                 onClick = { viewModel.updateSelectedId(option.id) },
@@ -150,7 +158,14 @@ fun MainScreen(viewModel: MainViewModel = viewModel { MainViewModel() }) {
                                     selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
                                     selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
                                 ),
-                                modifier = Modifier.defaultMinSize(minHeight = 36.dp)
+                                modifier = Modifier.defaultMinSize(minHeight = 48.dp).graphicsLayer {
+                                    scaleX = animatedScale
+                                    scaleY = animatedScale
+                                },
+                                elevation = FilterChipDefaults.filterChipElevation(
+                                    disabledElevation = 2.dp, // Base elevation
+                                    pressedElevation = 4.dp, // Elevation when pressed
+                                )
                             )
                         }
                     }
