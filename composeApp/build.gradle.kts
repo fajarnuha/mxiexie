@@ -57,6 +57,7 @@ kotlin {
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.androidx.datastore.preferences)
+            implementation(libs.kotlinx.datetime)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

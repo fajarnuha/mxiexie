@@ -16,6 +16,8 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
     private val selected = stringPreferencesKey("selected_access")
     private val token = stringPreferencesKey("token")
 
+    private val cache = stringPreferencesKey("access_cache")
+
     suspend fun setSelectedAccess(value: String) {
         dataStore.edit { preferences ->
             preferences[selected] = value
@@ -40,6 +42,18 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
     suspend fun getToken(): String? {
         return dataStore.data.map { preferences ->
             preferences[token]
+        }.first()
+    }
+
+    suspend fun setAccessCache(value: String) {
+        dataStore.edit { preferences ->
+            preferences[cache] = value
+        }
+    }
+
+    suspend fun getAccessCache(): String? {
+        return dataStore.data.map { preferences ->
+            preferences[cache]
         }.first()
     }
 

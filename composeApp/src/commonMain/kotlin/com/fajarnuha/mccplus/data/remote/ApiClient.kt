@@ -2,6 +2,7 @@ package com.fajarnuha.mccplus.data.remote
 
 import com.fajarnuha.mccplus.AccessDataWrapper
 import com.fajarnuha.mccplus.ApiResponse
+import com.fajarnuha.mccplus.TimeUtils
 import com.fajarnuha.mccplus.data.local.SettingsRepository
 import com.fajarnuha.mccplus.data.local.createDataStore
 import io.ktor.client.HttpClient
@@ -42,20 +43,6 @@ data class AccessResponse(
     val message: String? = null,
     val data: String? = null // Assuming data is a JSON string
 )
-
-@Serializable
-data class AccessData(
-    val validity: String,
-    @SerialName("accessData")
-    val accessInfo: List<AccessInfo>
-)
-
-@Serializable
-data class AccessInfo(
-    val description: String,
-    val token: String
-)
-
 
 class ApiClient(private val settings: SettingsRepository = SettingsRepository(createDataStore())) {
 
@@ -101,6 +88,12 @@ class ApiClient(private val settings: SettingsRepository = SettingsRepository(cr
      */
     suspend fun getAccessData(): Result<AccessDataWrapper> {
         return try {
+
+            val cache = runCatching { Json.decodeFromString<AccessDataWrapper>(settings.getAccessCache()!!) }.getOrNull()
+            if (cache != null && TimeUtils.isTokenStillValid(cache.validity)) {
+                return Result.success(cache)
+            }
+
             val response: AccessResponse = client.post("https://cc.project-on.net:30010/api/cc/v1/Access") {
                 header("Authorization", "Bearer ${settings.getToken()}")
                 contentType(ContentType.Application.Json)
@@ -109,6 +102,8 @@ class ApiClient(private val settings: SettingsRepository = SettingsRepository(cr
             if (response.success && !response.data.isNullOrBlank()) {
                 // Decode the inner JSON string from the 'data' field
                 val model = Json.decodeFromString<AccessDataWrapper>(response.data)
+
+                settings.setAccessCache(response.data)
                 Result.success(model)
             } else {
                 settings.setToken(null)
