@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -58,7 +60,6 @@ fun MainScreen(viewModel: MainViewModel = viewModel { MainViewModel() }) {
         lastContent = uiState as Content
     }
 
-
     LaunchedEffect(Unit) {
         scope.launch {
             viewModel.fetch()
@@ -71,14 +72,14 @@ fun MainScreen(viewModel: MainViewModel = viewModel { MainViewModel() }) {
     ) {
         PullToRefreshBox(
             isRefreshing = isRefreshing,
-            onRefresh = { viewModel.fetch() }
+            onRefresh = { viewModel.fetch(true) }
         ) {
             // Use the last remembered content if available, otherwise it's an initial load
             val contentToShow = lastContent
 
             if (contentToShow != null) {
                 Column(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     val sampleChipOptions = contentToShow.access
@@ -94,8 +95,6 @@ fun MainScreen(viewModel: MainViewModel = viewModel { MainViewModel() }) {
 
                         img = imageBitmapFromBytes(helloWorld.renderToBytes())
                     }
-
-
                     // Image at the top
                     if (img == null) {
                         Image(

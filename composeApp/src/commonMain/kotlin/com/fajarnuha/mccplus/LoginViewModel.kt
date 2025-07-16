@@ -28,7 +28,7 @@ class LoginViewModel(
     // Public and immutable, for the UI to collect
     val loginEffect = _loginEffect.asSharedFlow()
 
-    val isLogin = settingsRepository.getTokenFlow().map { it != null }
+    val isLogin = settingsRepository.getTokenFlow().map { true }
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     fun login(username: String, password: String) {

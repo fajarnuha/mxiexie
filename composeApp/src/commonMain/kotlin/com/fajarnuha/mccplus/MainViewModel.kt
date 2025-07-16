@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.fajarnuha.mccplus.data.local.SettingsRepository
 import com.fajarnuha.mccplus.data.local.createDataStore
 import com.fajarnuha.mccplus.data.remote.ApiClient
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -17,19 +18,21 @@ class MainViewModel(
     private val _uiState = MutableStateFlow<UiModel>(Loading)
     val uiState = _uiState
 
-    fun fetch() {
+    fun fetch(force: Boolean = false) {
+        _uiState.value = Loading
         viewModelScope.launch {
-            val response = api.getAccessData()
+            delay(100)
+            val response = api.getAccessData(force)
             if (response.isFailure) return@launch
-            val accessItems = Content.from(response.getOrNull()!!.accessDataList)
+            val accessList = response.getOrNull()!!.accessDataList
+//            val accessList = mockData()
+            val accessItems = Content.from(accessList)
             val savedId = settingsRepository.getSelectedAccess()
             val selectedId = accessItems.access.firstOrNull { it.id == savedId }?.id
                 ?: accessItems.access.first().id
             _uiState.value = accessItems.copy(selectedId = selectedId)
         }
     }
-
-
 
     fun updateSelectedId(id: String) {
         viewModelScope.launch {

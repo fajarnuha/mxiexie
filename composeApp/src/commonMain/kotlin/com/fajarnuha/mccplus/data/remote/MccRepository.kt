@@ -1,7 +1,6 @@
 package com.fajarnuha.mccplus.data.remote
 
 import com.fajarnuha.mccplus.AccessDataWrapper
-import com.fajarnuha.mccplus.ApiResponse
 import com.fajarnuha.mccplus.TimeUtils
 import com.fajarnuha.mccplus.data.local.SettingsRepository
 import com.fajarnuha.mccplus.data.local.createDataStore
@@ -11,11 +10,9 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
-import io.ktor.client.utils.EmptyContent.contentType
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
@@ -86,11 +83,11 @@ class ApiClient(private val settings: SettingsRepository = SettingsRepository(cr
      * Fetches access data using a bearer token.
      * @return A Result containing AccessData on success, or an Exception on failure.
      */
-    suspend fun getAccessData(): Result<AccessDataWrapper> {
+    suspend fun getAccessData(force: Boolean = false): Result<AccessDataWrapper> {
         return try {
 
             val cache = runCatching { Json.decodeFromString<AccessDataWrapper>(settings.getAccessCache()!!) }.getOrNull()
-            if (cache != null && TimeUtils.isTokenStillValid(cache.validity)) {
+            if (cache != null && TimeUtils.isTokenStillValid(cache.validity) && !force) {
                 return Result.success(cache)
             }
 
