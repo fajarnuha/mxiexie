@@ -25,11 +25,15 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import com.fajarnuha.mccplus.ui.PopupToast
 
 @Composable
 fun LoginScreen(onSuccess: () -> Unit, viewModel: LoginViewModel = viewModel { LoginViewModel() }) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+    var showToast by remember { mutableStateOf(false) }
+    var toastMessage by remember { mutableStateOf("") }
 
     // This block listens for effects from the ViewModel
     LaunchedEffect(Unit) {
@@ -40,7 +44,8 @@ fun LoginScreen(onSuccess: () -> Unit, viewModel: LoginViewModel = viewModel { L
                     onSuccess()
                 }
                 is LoginEffect.ShowErrorToast -> {
-                    // Handle showing a toast
+                    toastMessage = effect.message
+                    showToast = true
                 }
             }
         }
@@ -97,6 +102,12 @@ fun LoginScreen(onSuccess: () -> Unit, viewModel: LoginViewModel = viewModel { L
             }
         }
     }
+
+    PopupToast(
+        message = toastMessage,
+        isVisible = showToast,
+        onDismiss = { showToast = false }
+    )
 }
 
 @Preview()
