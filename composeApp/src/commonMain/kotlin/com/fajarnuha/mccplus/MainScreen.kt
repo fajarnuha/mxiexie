@@ -2,6 +2,7 @@ package com.fajarnuha.mccplus
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -17,6 +18,7 @@ import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -48,10 +50,17 @@ fun MainScreen(viewModel: MainViewModel = viewModel { MainViewModel() }) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
+    val isRefreshing = uiState is Loading
+
+    // Remember the last successful content state to display during refresh
+    var lastContent by remember { mutableStateOf<Content?>(null) }
+    if (uiState is Content) {
+        lastContent = uiState as Content
+    }
+
 
     LaunchedEffect(Unit) {
         scope.launch {
-            delay(1000)
             viewModel.fetch()
         }
     }
@@ -60,16 +69,20 @@ fun MainScreen(viewModel: MainViewModel = viewModel { MainViewModel() }) {
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = { viewModel.fetch() }
         ) {
-            when (uiState) {
-                is Content -> {
-                    val sampleImagePainter =
-                        painterResource(resource = Res.drawable.compose_multiplatform)
-                    val sampleChipOptions = (uiState as Content).access
-                    val selectedChip = (uiState as Content).selectedId
+            // Use the last remembered content if available, otherwise it's an initial load
+            val contentToShow = lastContent
+
+            if (contentToShow != null) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    val sampleChipOptions = contentToShow.access
+                    val selectedChip = contentToShow.selectedId
 
                     var img: ImageBitmap? by remember { mutableStateOf(null) }
 
@@ -86,7 +99,7 @@ fun MainScreen(viewModel: MainViewModel = viewModel { MainViewModel() }) {
                     // Image at the top
                     if (img == null) {
                         Image(
-                            painter = sampleImagePainter,
+                            painter = painterResource(resource = Res.drawable.compose_multiplatform),
                             contentDescription = "Descriptive text for the image", // Important for accessibility
                             modifier = Modifier
                                 .size(120.dp)
@@ -126,7 +139,13 @@ fun MainScreen(viewModel: MainViewModel = viewModel { MainViewModel() }) {
                             FilterChip(
                                 selected = (option.id == selectedChip),
                                 onClick = { viewModel.updateSelectedId(option.id) },
-                                label = { Text(option.name, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold) },
+                                label = {
+                                    Text(
+                                        option.name,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                },
                                 shape = MaterialTheme.shapes.medium,
                                 colors = FilterChipDefaults.filterChipColors(
                                     selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -137,8 +156,22 @@ fun MainScreen(viewModel: MainViewModel = viewModel { MainViewModel() }) {
                         }
                     }
                 }
-
-                Loading -> CircularProgressIndicator()
+            } else {
+                // Initial load, show the centered spinner
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (isRefreshing) {
+                        // This space is intentionally left blank during initial load,
+                        // as the PullToRefreshBox indicator is already showing.
+                        // If you want a full-screen spinner for initial load,
+                        // you can place it here, but it might be redundant with the refresh indicator.
+                    } else {
+                        // Optional: Show something if not refreshing and no content
+                        Text("No content available.")
+                    }
+                }
             }
         }
     }
