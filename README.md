@@ -1,6 +1,6 @@
-# MCC Plus
+# mxiexie
 
-MCC Plus is a mobile application that allows you to access your accounts and display QR codes for quick access.
+mxiexie is a mobile application that allows you to access your accounts and display QR codes for quick access. This project is intended for easy to use access to MCC building.
 
 ## Overview
 
@@ -13,7 +13,7 @@ This project is built with modern technologies for cross-platform development:
 *   **Kotlin Multiplatform:** The core logic of the application is written in Kotlin and shared between Android and iOS, ensuring consistency and faster development.
 *   **Jetpack Compose:** The user interface is built with Jetpack Compose, a modern declarative UI toolkit for building native Android and iOS apps from a single codebase.
 *   **Ktor:** For handling network requests, we use Ktor, a lightweight and asynchronous HTTP client for Kotlin.
-*   **Multiplatform-Settings:** This library is used for persisting data locally on both Android and iOS.
+*   **Datastore Preference Multiplatform:** This library is used for persisting data locally on both Android and iOS.
 
 ## Getting the Latest Version
 
