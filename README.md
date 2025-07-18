@@ -1,22 +1,42 @@
-This is a Kotlin Multiplatform project targeting Android, iOS.
+# mxiexie
 
-* `/composeApp` is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - `commonMain` is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    `iosMain` would be the right folder for such calls.
+mxiexie is a mobile application that allows you to access your accounts and display QR codes for quick access. This project is intended for easy to use access to MCC building.
 
-* `/iosApp` contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform, 
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
+## Overview
 
-## Architecture Overview
+This application is a client for a service that provides access data in the form of QR codes. After logging in, you can see a list of your accounts and select one to display the corresponding QR code. This is useful for quick access to services that use QR codes for authentication or access control.
 
-This project follows a common Kotlin Multiplatform architecture:
+## Technology Stack
 
-*   **Shared UI:** The UI is built with Compose Multiplatform and resides in `/composeApp/src/commonMain`. This allows for a single codebase for the user interface across Android and iOS.
-*   **ViewModels:** ViewModels are also located in `/composeApp/src/commonMain` and handle the presentation logic for the UI. They interact with repositories to fetch and manage data.
-*   **Data Layer:** The data layer, including repositories and network clients, is primarily in `/composeApp/src/commonMain`. It's responsible for abstracting data sources (network, local database, etc.).
-*   **Platform-Specific Implementations:** For platform-specific functionalities (like showing a Toast on Android or a UIAlertController on iOS), we use the `expect`/`actual` mechanism. `expect` declarations are in `commonMain`, and `actual` implementations are in the respective platform-specific source sets (e.g., `androidMain`, `iosMain`).
+This project is built with modern technologies for cross-platform development:
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+*   **Kotlin Multiplatform:** The core logic of the application is written in Kotlin and shared between Android and iOS, ensuring consistency and faster development.
+*   **Jetpack Compose:** The user interface is built with Jetpack Compose, a modern declarative UI toolkit for building native Android and iOS apps from a single codebase.
+*   **Ktor:** For handling network requests, we use Ktor, a lightweight and asynchronous HTTP client for Kotlin.
+*   **Datastore Preference Multiplatform:** This library is used for persisting data locally on both Android and iOS.
+
+## Getting the Latest Version
+
+You can download the latest version of the application from the GitHub Releases page.
+
+### Android
+
+1.  Open the [GitHub Releases](https://github.com/FajarNuha/MCC-Plus/releases) page.
+2.  Find the latest release and download the `.apk` file.
+3.  Open the downloaded file on your Android device to install the application. You may need to allow installations from unknown sources in your device's settings.
+
+### iOS
+
+1.  Open the [GitHub Releases](https://github.com/FajarNuha/MCC-Plus/releases) page.
+2.  Find the latest release and download the `.ipa` file.
+3.  To install the `.ipa` file on your iOS device, you can use [AltStore](https://altstore.io/) or other similar tools. Please note that you may need a developer account to sign the application.
+
+## Building from Source
+
+If you want to build the application from the source code, you will need to have the following tools installed:
+
+*   Android Studio
+*   Xcode (for the iOS app)
+*   Kotlin Multiplatform Mobile plugin
+
+Once you have the necessary tools, you can clone the repository and open it in Android Studio. From there, you can build and run the application on your devices or emulators.
