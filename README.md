@@ -7,6 +7,8 @@ This project was born out of a desire to enhance the user experience of the offi
 - Persistent floor access
 - An improved user experience through the use of Group Chips instead of dropdown selections.
 
+<img src="/asset/demo.gif" width="250" height="600"/>
+
 ## Overview
 
 This application is a client for a service that provides access data in the form of QR codes. After logging in, you can see a list of your access and select one to display the corresponding QR code. This is useful for quick access to services that use QR codes for authentication or access control.

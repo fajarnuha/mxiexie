@@ -33,7 +33,7 @@ fun mockData(): List<AccessDataItem> {
       "success": true,
       "errorCode": 0,
       "message": "",
-      "data": "{\"validity\":\"2025-07-14T16:05:55.280521\",\"accessData\":[{\"description\":\"BYTEDANCE 27\",\"token\":\"4219159374\"},{\"description\":\"BYTEDANCE 28\",\"token\":\"4219161374\"},{\"description\":\"BYTEDANCE 30\",\"token\":\"4219160374\"},{\"description\":\"BYTEDANCE 31\",\"token\":\"4219162374\"},{\"description\":\"BYTEDANCE 26\",\"token\":\"4219163374\"},{\"description\":\"BYTEDANCE 29\",\"token\":\"4219164374\"}]}"
+      "data": "{\"validity\":\"2025-07-14T16:05:55.280521\",\"accessData\":[{\"description\":\"ACCESS 27\",\"token\":\"4219159374\"},{\"description\":\"ACCESS 28\",\"token\":\"4219161374\"},{\"description\":\"ACCESS 30\",\"token\":\"4219160374\"},{\"description\":\"ACCESS 31\",\"token\":\"4219162374\"},{\"description\":\"ACCESS 26\",\"token\":\"4219163374\"},{\"description\":\"ACCESS 29\",\"token\":\"4219164374\"}]}"
     }
     """.trimIndent()
 
