@@ -1,10 +1,15 @@
 # mxiexie
 
-mxiexie is a mobile application that allows you to access your accounts and display QR codes for quick access. This project is intended for easy to use access to MCC building.
+mxiexie is a mobile application that allows you to display QR codes for quick access to MCC Building. 
+This project was born out of a desire to enhance the user experience of the official application. This alternative app offers several usability improvements, including:
+- Offline functionality
+- Optimized network fetching
+- Persistent floor access
+- An improved user experience through the use of Group Chips instead of dropdown selections.
 
 ## Overview
 
-This application is a client for a service that provides access data in the form of QR codes. After logging in, you can see a list of your accounts and select one to display the corresponding QR code. This is useful for quick access to services that use QR codes for authentication or access control.
+This application is a client for a service that provides access data in the form of QR codes. After logging in, you can see a list of your access and select one to display the corresponding QR code. This is useful for quick access to services that use QR codes for authentication or access control.
 
 ## Technology Stack
 
@@ -25,7 +30,7 @@ You can download the latest version of the application from the GitHub Releases 
 2.  Find the latest release and download the `.apk` file.
 3.  Open the downloaded file on your Android device to install the application. You may need to allow installations from unknown sources in your device's settings.
 
-### iOS
+### iOS (WIP) <img src="https://img.shields.io/badge/WIP-yellow?style=flat-square" alt="WIP"/>
 
 1.  Open the [GitHub Releases](https://github.com/FajarNuha/MCC-Plus/releases) page.
 2.  Find the latest release and download the `.ipa` file.
