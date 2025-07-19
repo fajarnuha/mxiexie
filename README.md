@@ -11,6 +11,15 @@ This project was born out of a desire to enhance the user experience of the offi
 
 This application is a client for a service that provides access data in the form of QR codes. After logging in, you can see a list of your access and select one to display the corresponding QR code. This is useful for quick access to services that use QR codes for authentication or access control.
 
+Your user data, including login credentials and access information, is stored locally on your device and is only sent to the official service for authentication and data retrieval. This application does not save or transmit your data to any other third-party servers.
+
+## Development Process
+
+The development of this application involved several key stages:
+*   **Reverse Engineering:** The original application's behavior and API interactions were analyzed using [JADX](https://github.com/skylot/jadx) to decompile its Android APK. This helped in understanding the underlying mechanisms.
+*   **Cross-Platform Development:** The application was developed using Kotlin Multiplatform (KMP), allowing for shared business logic across Android and iOS platforms, leading to efficient development and maintenance.
+*   **AI-Assisted Coding:** A significant portion of the codebase was developed with the assistance of Android Studio Agent Mode and Jules, leveraging AI to accelerate development and improve code quality.
+
 ## Technology Stack
 
 This project is built with modern technologies for cross-platform development:
