@@ -30,7 +30,7 @@ You can download the latest version of the application from the GitHub Releases 
 2.  Find the latest release and download the `.apk` file.
 3.  Open the downloaded file on your Android device to install the application. You may need to allow installations from unknown sources in your device's settings.
 
-### iOS (WIP) <img src="https://img.shields.io/badge/WIP-yellow?style=flat-square" alt="WIP"/>
+### iOS (WIP) <img src="https://img.shields.io/badge/WIP-yellow?style=flat-square" alt="WIP"/> [#2](https://github.com/fajarnuha/mxiexie/issues/2)
 
 1.  Open the [GitHub Releases](https://github.com/FajarNuha/MCC-Plus/releases) page.
 2.  Find the latest release and download the `.ipa` file.
