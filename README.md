@@ -7,7 +7,7 @@ This project was born out of a desire to enhance the user experience of the offi
 - Persistent floor access
 - An improved user experience through the use of Group Chips instead of dropdown selections.
 
-![Demo App](/asset/demo.webm)
+![Demo App](/asset/demo.gif)
 
 ## Overview
 
