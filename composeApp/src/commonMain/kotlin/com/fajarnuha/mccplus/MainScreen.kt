@@ -69,7 +69,7 @@ fun MainScreen(viewModel: MainViewModel = viewModel { MainViewModel() }) {
     val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
 
     LaunchedEffect(lifecycleState) {
-        when(lifecycleState) {
+        when (lifecycleState) {
             DESTROYED, INITIALIZED, CREATED, STARTED -> Unit // Do nothing
             RESUMED -> {
                 scope.launch {
@@ -108,18 +108,8 @@ fun MainScreen(viewModel: MainViewModel = viewModel { MainViewModel() }) {
 
                         img = imageBitmapFromBytes(helloWorld.renderToBytes())
                     }
-                    // Image at the top
-                    if (img == null) {
-                        Image(
-                            painter = painterResource(resource = Res.drawable.compose_multiplatform),
-                            contentDescription = "Descriptive text for the image", // Important for accessibility
-                            modifier = Modifier
-                                .size(120.dp)
-                                .weight(1f) // Takes up available vertical space above chips
-                                .padding(16.dp),
-                            contentScale = ContentScale.Fit // Or ContentScale.Crop, etc.
-                        )
-                    } else {
+
+                    img?.let {
                         Image(
                             bitmap = img!!,
                             contentDescription = "Descriptive text for the image", // Important for accessibility
@@ -130,7 +120,6 @@ fun MainScreen(viewModel: MainViewModel = viewModel { MainViewModel() }) {
                             contentScale = ContentScale.Fit // Or ContentScale.Crop, etc.
                         )
                     }
-
 
                     Text(
                         text = "",
@@ -168,10 +157,11 @@ fun MainScreen(viewModel: MainViewModel = viewModel { MainViewModel() }) {
                                     selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
                                     selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
                                 ),
-                                modifier = Modifier.defaultMinSize(minHeight = 48.dp).graphicsLayer {
-                                    scaleX = animatedScale
-                                    scaleY = animatedScale
-                                },
+                                modifier = Modifier.defaultMinSize(minHeight = 48.dp)
+                                    .graphicsLayer {
+                                        scaleX = animatedScale
+                                        scaleY = animatedScale
+                                    },
                                 elevation = FilterChipDefaults.filterChipElevation(
                                     disabledElevation = 2.dp, // Base elevation
                                     pressedElevation = 4.dp, // Elevation when pressed
