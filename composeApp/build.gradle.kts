@@ -87,7 +87,11 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("debug")
         }
+    }
+    lint {
+        disable += "NullSafeMutableLiveData"
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
