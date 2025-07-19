@@ -27,7 +27,8 @@ jobs:
         run: ./gradlew composeApp:bundleRelease
 
       - name: Archive production artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: app-release
           path: composeApp/build/outputs/apk/release/composeApp-release.apk
+          retention-days: 7
