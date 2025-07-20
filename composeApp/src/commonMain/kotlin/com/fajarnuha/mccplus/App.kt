@@ -19,7 +19,11 @@ fun App() {
         val isLogin by vm.isLogin.collectAsStateWithLifecycle()
         when {
             isLogin -> MainScreen()
-            else -> LoginScreen(vm)
+            else -> {
+                LoginScreen(onSuccess = {
+
+                }, vm)
+            }
         }
     }
 }
