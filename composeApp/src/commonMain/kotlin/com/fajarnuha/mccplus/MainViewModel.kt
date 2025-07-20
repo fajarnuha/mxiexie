@@ -5,72 +5,79 @@ import androidx.lifecycle.viewModelScope
 import com.fajarnuha.mccplus.data.local.SettingsRepository
 import com.fajarnuha.mccplus.data.local.createDataStore
 import com.fajarnuha.mccplus.data.remote.ApiClient
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import qrcode.QRCode
+import qrcode.color.Colors
 
 class MainViewModel(
     private val settingsRepository: SettingsRepository = SettingsRepository(createDataStore()),
     private val api: ApiClient = ApiClient()
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<UiModel>(Loading)
-    val uiState = _uiState
+    private val _uiState = MutableStateFlow(MainUiState.Default)
+    val uiState get() = _uiState.asStateFlow()
 
     fun fetch(force: Boolean = false) {
-        _uiState.value = Loading
-        viewModelScope.launch {
+        _uiState.update { it.copy(state = ScreenUiState.Loading) }
+
+        viewModelScope.launch(Dispatchers.IO) {
             delay(100)
             val response = api.getAccessData(force)
-            if (response.isFailure) return@launch
-            val accessList = response.getOrNull()!!.accessDataList
-//            val accessList = mockData()
-            val accessItems = Content.from(accessList.sortedBy { it.description })
-            val savedId = settingsRepository.getSelectedAccess()
-            val selectedId = accessItems.access.firstOrNull { it.id == savedId }?.id
-                ?: accessItems.access.first().id
-            _uiState.value = accessItems.copy(selectedId = selectedId)
+
+            response
+                .onSuccess { onFetchSucceed(it) }
+                .onFailure { onFetchError() }
         }
     }
 
     fun updateSelectedId(id: String) {
-        viewModelScope.launch {
-            (_uiState.value as? Content)?.let {
-                _uiState.value = it.copy(selectedId = id)
-                settingsRepository.setSelectedAccess(id)
-            }
+        _uiState.update { it.copy(selectedId = id) }
+        viewModelScope.launch { settingsRepository.setSelectedAccess(id) }
+    }
+
+    fun generateQrCode() {
+        val selectedId = _uiState.value.selectedId ?: return
+        val data = _uiState.value.access.firstOrNull { it.id == selectedId } ?: return
+
+        viewModelScope.launch(Dispatchers.IO) {
+            val qrCode = QRCode.ofSquares()
+                .withColor(Colors.BLACK) // Default is Colors.BLACK
+                .withSize(10) // Default is 25
+                .build(data.qr)
+
+            val toImageBitmap = imageBitmapFromBytes(qrCode.renderToBytes())
+            _uiState.update { it.copy(lastQrCodeBytes = toImageBitmap) }
         }
     }
 
-}
+    private suspend fun onFetchSucceed(res: AccessDataWrapper) {
+        val accessList = MainUiState.toAccessList(res.accessDataList.sortedBy { it.description })
+        val savedId = settingsRepository.getSelectedAccess()
 
-sealed interface UiModel
+        val selectedId = accessList
+            .firstOrNull { it.id == savedId }?.id
+            ?: accessList.first().id
 
-object Loading : UiModel
-
-data class Content(
-    val access: List<Access>,
-    val selectedId: String? = null
-) : UiModel {
-    data class Access(
-        val id: String,
-        val name: String,
-        val qr: String
-    )
-
-    companion object {
-        fun from(response: List<AccessDataItem>): Content {
-            return response.map {
-                Access(
-                    id = it.description,
-                    name = it.description,
-                    qr = it.token
-                )
-            }.let {
-                Content(it)
-            }
+        _uiState.update {
+            it.copy(
+                access = accessList,
+                selectedId = selectedId,
+                state = ScreenUiState.Succeed
+            )
         }
     }
 
+    private fun onFetchError() {
+        _uiState.update {
+            it.copy(
+                state = ScreenUiState.Error
+            )
+        }
+    }
 }

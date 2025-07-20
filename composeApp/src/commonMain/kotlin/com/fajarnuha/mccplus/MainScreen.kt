@@ -26,13 +26,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -43,40 +38,28 @@ import androidx.lifecycle.Lifecycle.State.INITIALIZED
 import androidx.lifecycle.Lifecycle.State.RESUMED
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import qrcode.QRCode
-import qrcode.color.Colors
 
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class) // Added ExperimentalLayoutApi
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(viewModel: MainViewModel = viewModel { MainViewModel() }) {
-
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val scope = rememberCoroutineScope()
-    val isRefreshing = uiState is Loading
-
-    // Remember the last successful content state to display during refresh
-    var lastContent by remember { mutableStateOf<Content?>(null) }
-    if (uiState is Content) {
-        lastContent = uiState as Content
-    }
-
     val lifecycleOwner = LocalLifecycleOwner.current
     val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(lifecycleState) {
         when (lifecycleState) {
             DESTROYED, INITIALIZED, CREATED, STARTED -> Unit // Do nothing
             RESUMED -> {
-                scope.launch {
-                    viewModel.fetch()
-                }
+                viewModel.fetch()
             }
         }
+    }
+
+    LaunchedEffect(uiState.selectedId) {
+        viewModel.generateQrCode()
     }
 
     Surface(
@@ -84,40 +67,23 @@ fun MainScreen(viewModel: MainViewModel = viewModel { MainViewModel() }) {
         color = MaterialTheme.colorScheme.background
     ) {
         PullToRefreshBox(
-            isRefreshing = isRefreshing,
+            isRefreshing = uiState.isLoading(),
             onRefresh = { viewModel.fetch(true) }
         ) {
-            // Use the last remembered content if available, otherwise it's an initial load
-            val contentToShow = lastContent
-
-            if (contentToShow != null) {
+            if (!uiState.isError()) {
                 Column(
                     modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    val sampleChipOptions = contentToShow.access
-                    val selectedChip = contentToShow.selectedId
-
-                    var img: ImageBitmap? by remember { mutableStateOf(null) }
-
-                    LaunchedEffect(selectedChip) {
-                        val helloWorld = QRCode.ofSquares()
-                            .withColor(Colors.BLACK) // Default is Colors.BLACK
-                            .withSize(10) // Default is 25
-                            .build(sampleChipOptions.first { it.id == selectedChip }.qr)
-
-                        img = imageBitmapFromBytes(helloWorld.renderToBytes())
-                    }
-
-                    img?.let {
+                    uiState.lastQrCodeBytes?.let { imageBitmap ->
                         Image(
-                            bitmap = img!!,
-                            contentDescription = "Descriptive text for the image", // Important for accessibility
+                            bitmap = imageBitmap,
+                            contentDescription = null,
                             modifier = Modifier
                                 .size(280.dp)
-                                .weight(1f) // Takes up available vertical space above chips
+                                .weight(1f)
                                 .padding(16.dp),
-                            contentScale = ContentScale.Fit // Or ContentScale.Crop, etc.
+                            contentScale = ContentScale.Fit
                         )
                     }
 
@@ -135,15 +101,15 @@ fun MainScreen(viewModel: MainViewModel = viewModel { MainViewModel() }) {
                         horizontalArrangement = Arrangement.SpaceAround, // Spacing between items in the same line
                         verticalArrangement = Arrangement.spacedBy(8.dp) // Spacing between lines
                     ) {
-                        sampleChipOptions.forEach { option -> // Iterate using forEach for FlowRow
-                            val targetScale = if (option.id == selectedChip) 1.1f else 1.0f
+                        uiState.access.forEach { option -> // Iterate using forEach for FlowRow
+                            val targetScale = if (option.id == uiState.selectedId) 1.1f else 1.0f
                             val animatedScale by animateFloatAsState(
                                 targetValue = targetScale,
                                 animationSpec = tween(durationMillis = 100), // Adjust duration as needed
                                 label = "chipScale"
                             )
                             FilterChip(
-                                selected = (option.id == selectedChip),
+                                selected = (option.id == uiState.selectedId),
                                 onClick = { viewModel.updateSelectedId(option.id) },
                                 label = {
                                     Text(
@@ -176,7 +142,7 @@ fun MainScreen(viewModel: MainViewModel = viewModel { MainViewModel() }) {
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (isRefreshing) {
+                    if (uiState.isLoading() && uiState.access.isNotEmpty()) {
                         // This space is intentionally left blank during initial load,
                         // as the PullToRefreshBox indicator is already showing.
                         // If you want a full-screen spinner for initial load,
@@ -191,8 +157,6 @@ fun MainScreen(viewModel: MainViewModel = viewModel { MainViewModel() }) {
     }
 }
 
-
-@OptIn(ExperimentalLayoutApi::class)
 @Preview()
 @Composable
 fun ImageWithChipSelectionScreenFlowRowPreview() { // Renamed preview for clarity

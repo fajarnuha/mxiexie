@@ -29,7 +29,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import com.fajarnuha.mccplus.ui.PopupToast
 
 @Composable
-fun LoginScreen(onSuccess: () -> Unit, viewModel: LoginViewModel = viewModel { LoginViewModel() }) {
+fun LoginScreen(viewModel: LoginViewModel = viewModel { LoginViewModel() }) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
@@ -40,10 +40,7 @@ fun LoginScreen(onSuccess: () -> Unit, viewModel: LoginViewModel = viewModel { L
     LaunchedEffect(Unit) {
         viewModel.loginEffect.collect { effect ->
             when (effect) {
-                is LoginEffect.NavigateToMain -> {
-                    // Handle navigation
-                    onSuccess()
-                }
+                is LoginEffect.NavigateToMain -> Unit
                 is LoginEffect.ShowErrorToast -> {
                     toastMessage = effect.message
                     showToast = true
@@ -111,10 +108,10 @@ fun LoginScreen(onSuccess: () -> Unit, viewModel: LoginViewModel = viewModel { L
     )
 }
 
-@Preview()
+@Preview
 @Composable
 fun LoginScreenPreview() {
-    MaterialTheme { // Apply a MaterialTheme for the preview
-        LoginScreen({})
+    MaterialTheme {
+        LoginScreen()
     }
 }
