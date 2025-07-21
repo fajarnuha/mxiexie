@@ -9,9 +9,13 @@ import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSUserDomainMask
 
-@OptIn(ExperimentalForeignApi::class)
 actual fun createDataStore(): DataStore<Preferences> {
-    return PreferenceDataStoreFactory.createWithPath(
+    return datastore
+}
+
+@OptIn(ExperimentalForeignApi::class)
+val datastore by lazy {
+    PreferenceDataStoreFactory.createWithPath(
         produceFile = {
             val documentDirectory = NSFileManager.defaultManager.URLForDirectory(
                 directory = NSDocumentDirectory,
