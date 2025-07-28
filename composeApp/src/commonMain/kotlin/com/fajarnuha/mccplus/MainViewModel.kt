@@ -9,6 +9,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -19,6 +26,8 @@ class MainViewModel(
     private val settingsRepository: SettingsRepository = SettingsRepository(createDataStore()),
     private val api: ApiClient = ApiClient()
 ) : ViewModel() {
+
+    private val viewModelScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     private val _uiState = MutableStateFlow(MainUiState.Default)
     val uiState get() = _uiState.asStateFlow()
@@ -45,10 +54,10 @@ class MainViewModel(
         val selectedId = _uiState.value.selectedId ?: return
         val data = _uiState.value.access.firstOrNull { it.id == selectedId } ?: return
 
-        viewModelScope.launch(Dispatchers.IO) {
+        launch(Dispatchers.IO) {
             val qrCode = QRCode.ofSquares()
-                .withColor(Colors.BLACK) // Default is Colors.BLACK
-                .withSize(10) // Default is 25
+                .withColor(Colors.BLACK)
+                .withSize(10)
                 .build(data.qr)
 
             val toImageBitmap = imageBitmapFromBytes(qrCode.renderToBytes())
@@ -79,5 +88,10 @@ class MainViewModel(
                 state = ScreenUiState.Error
             )
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        viewModelScope.cancel()
     }
 }
