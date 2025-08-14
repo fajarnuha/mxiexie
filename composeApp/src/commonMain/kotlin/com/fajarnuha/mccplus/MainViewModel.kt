@@ -17,7 +17,7 @@ import qrcode.color.Colors
 
 class MainViewModel(
     private val settingsRepository: SettingsRepository = SettingsRepository(createDataStore()),
-    private val api: ApiClient = ApiClient()
+    private val api: ApiClient = ApiClient(settingsRepository) // Ensure ApiClient gets SettingsRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MainUiState.Default)
@@ -78,6 +78,18 @@ class MainViewModel(
             it.copy(
                 state = ScreenUiState.Error
             )
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val result = api.logout()
+            // Handle logout result (e.g., navigate to login screen, clear user data)
+            if (result.isSuccess) {
+                // Optionally update UI state or trigger navigation
+            } else {
+                // Handle logout failure
+            }
         }
     }
 }

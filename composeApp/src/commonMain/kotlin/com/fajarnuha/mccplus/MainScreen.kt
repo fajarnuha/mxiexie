@@ -15,9 +15,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -32,17 +37,13 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle.State.CREATED
-import androidx.lifecycle.Lifecycle.State.DESTROYED
-import androidx.lifecycle.Lifecycle.State.INITIALIZED
-import androidx.lifecycle.Lifecycle.State.RESUMED
-import androidx.lifecycle.Lifecycle.State.STARTED
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun MainScreen(viewModel: MainViewModel = viewModel { MainViewModel() }) {
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -51,8 +52,8 @@ fun MainScreen(viewModel: MainViewModel = viewModel { MainViewModel() }) {
 
     LaunchedEffect(lifecycleState) {
         when (lifecycleState) {
-            DESTROYED, INITIALIZED, CREATED, STARTED -> Unit // Do nothing
-            RESUMED -> {
+            Lifecycle.State.DESTROYED, Lifecycle.State.INITIALIZED, Lifecycle.State.CREATED, Lifecycle.State.STARTED -> Unit // Do nothing
+            Lifecycle.State.RESUMED -> {
                 viewModel.fetch()
             }
         }
@@ -66,92 +67,104 @@ fun MainScreen(viewModel: MainViewModel = viewModel { MainViewModel() }) {
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        PullToRefreshBox(
-            isRefreshing = uiState.isLoading(),
-            onRefresh = { viewModel.fetch(true) }
-        ) {
-            if (!uiState.isError()) {
-                Column(
-                    modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    uiState.lastQrCodeBytes?.let { imageBitmap ->
-                        Image(
-                            bitmap = imageBitmap,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(280.dp)
-                                .weight(1f)
-                                .padding(16.dp),
-                            contentScale = ContentScale.Fit
-                        )
-                    }
-
-                    Text(
-                        text = "",
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier
-                    )
-
-                    // FlowRow for chips
-                    FlowRow(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 24.dp, vertical = 48.dp),
-                        horizontalArrangement = Arrangement.SpaceAround, // Spacing between items in the same line
-                        verticalArrangement = Arrangement.spacedBy(8.dp) // Spacing between lines
+        Box(modifier = Modifier.fillMaxSize()) {
+            PullToRefreshBox(
+                isRefreshing = uiState.isLoading(),
+                onRefresh = { viewModel.fetch(true) },
+                modifier = Modifier.fillMaxSize()
+            ) {
+                if (!uiState.isError()) {
+                    Column(
+                        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        uiState.access.forEach { option -> // Iterate using forEach for FlowRow
-                            val targetScale = if (option.id == uiState.selectedId) 1.1f else 1.0f
-                            val animatedScale by animateFloatAsState(
-                                targetValue = targetScale,
-                                animationSpec = tween(durationMillis = 100), // Adjust duration as needed
-                                label = "chipScale"
+                        uiState.lastQrCodeBytes?.let { imageBitmap ->
+                            Image(
+                                bitmap = imageBitmap,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(280.dp)
+                                    .weight(1f)
+                                    .padding(16.dp),
+                                contentScale = ContentScale.Fit
                             )
-                            FilterChip(
-                                selected = (option.id == uiState.selectedId),
-                                onClick = { viewModel.updateSelectedId(option.id) },
-                                label = {
-                                    Text(
-                                        option.name,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        fontWeight = FontWeight.SemiBold
-                                    )
-                                },
-                                shape = MaterialTheme.shapes.medium,
-                                colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                                    selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
-                                ),
-                                modifier = Modifier.defaultMinSize(minHeight = 48.dp)
-                                    .graphicsLayer {
-                                        scaleX = animatedScale
-                                        scaleY = animatedScale
-                                    },
-                                elevation = FilterChipDefaults.filterChipElevation(
-                                    disabledElevation = 2.dp, // Base elevation
-                                    pressedElevation = 4.dp, // Elevation when pressed
+                        }
+
+                        Text(
+                            text = "",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier
+                        )
+
+                        // FlowRow for chips
+                        FlowRow(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 24.dp, vertical = 48.dp),
+                            horizontalArrangement = Arrangement.SpaceAround, // Spacing between items in the same line
+                            verticalArrangement = Arrangement.spacedBy(8.dp) // Spacing between lines
+                        ) {
+                            uiState.access.forEach { option -> // Iterate using forEach for FlowRow
+                                val targetScale = if (option.id == uiState.selectedId) 1.1f else 1.0f
+                                val animatedScale by animateFloatAsState(
+                                    targetValue = targetScale,
+                                    animationSpec = tween(durationMillis = 100), // Adjust duration as needed
+                                    label = "chipScale"
                                 )
-                            )
+                                FilterChip(
+                                    selected = (option.id == uiState.selectedId),
+                                    onClick = { viewModel.updateSelectedId(option.id) },
+                                    label = {
+                                        Text(
+                                            option.name,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = FontWeight.SemiBold
+                                        )
+                                    },
+                                    shape = MaterialTheme.shapes.medium,
+                                    colors = FilterChipDefaults.filterChipColors(
+                                        selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                        selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
+                                    ),
+                                    modifier = Modifier.defaultMinSize(minHeight = 48.dp)
+                                        .graphicsLayer {
+                                            scaleX = animatedScale
+                                            scaleY = animatedScale
+                                        },
+                                    elevation = FilterChipDefaults.filterChipElevation(
+                                        disabledElevation = 2.dp, // Base elevation
+                                        pressedElevation = 4.dp, // Elevation when pressed
+                                    )
+                                )
+                            }
+                        }
+                    }
+                } else {
+                    // Initial load, show the centered spinner
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (uiState.isLoading() && uiState.access.isNotEmpty()) {
+                            // This space is intentionally left blank during initial load,
+                            // as the PullToRefreshBox indicator is already showing.
+                            // If you want a full-screen spinner for initial load,
+                            // you can place it here, but it might be redundant with the refresh indicator.
+                        } else {
+                            // Optional: Show something if not refreshing and no content
+                            Text("No content available.")
                         }
                     }
                 }
-            } else {
-                // Initial load, show the centered spinner
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (uiState.isLoading() && uiState.access.isNotEmpty()) {
-                        // This space is intentionally left blank during initial load,
-                        // as the PullToRefreshBox indicator is already showing.
-                        // If you want a full-screen spinner for initial load,
-                        // you can place it here, but it might be redundant with the refresh indicator.
-                    } else {
-                        // Optional: Show something if not refreshing and no content
-                        Text("No content available.")
-                    }
-                }
+            }
+            IconButton(
+                onClick = { viewModel.logout() },
+                modifier = Modifier.align(Alignment.TopEnd).padding(16.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Logout,
+                    contentDescription = "Logout"
+                )
             }
         }
     }

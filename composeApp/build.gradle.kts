@@ -34,6 +34,7 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+
             implementation("io.ktor:ktor-client-android:2.3.8")
             implementation(libs.kotlinx.coroutines.android)
         }
@@ -44,10 +45,10 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
+            implementation(compose.materialIconsExtended)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation("io.github.g0dkar:qrcode-kotlin:4.5.0")
-
             implementation("io.ktor:ktor-client-core:2.3.8")
             // Ktor Content Negotiation (for serialization/deserialization)
             implementation("io.ktor:ktor-client-content-negotiation:2.3.8")
