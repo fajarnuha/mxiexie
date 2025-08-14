@@ -45,7 +45,7 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
-            implementation(compose.materialIconsExtended)
+//            implementation(compose.materialIconsExtended)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation("io.github.g0dkar:qrcode-kotlin:4.5.0")
@@ -77,8 +77,8 @@ android {
         applicationId = "com.fajarnuha.mccplus"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 12
+        versionName = "1.2"
     }
     packaging {
         resources {
