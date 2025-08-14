@@ -11,7 +11,10 @@ import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
+import io.ktor.http.headers
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -50,6 +53,16 @@ class ApiClient(private val settings: SettingsRepository = SettingsRepository(cr
                 isLenient = true
                 ignoreUnknownKeys = true // Good practice for API changes
             })
+            headers {
+                append("Content-Type", "application/json")
+                append(HttpHeaders.Accept, "*/*")
+                append(HttpHeaders.Origin, "https://localhost")
+                append(HttpHeaders.Referrer, "https://localhost")
+                append("X-Requested-With", "cc.mcc")
+
+                // Ktor's engine usually handles the User-Agent, but you can override it.
+                append(HttpHeaders.UserAgent, "Mozilla/5.0 (Linux; Android 11; MI 5 Build/RQ3A.211001.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/100.0.4896.127 Mobile Safari/537.36")
+            }
         }
     }
 
@@ -107,6 +120,23 @@ class ApiClient(private val settings: SettingsRepository = SettingsRepository(cr
                 Result.failure(Exception(response.message ?: "Failed to get access data."))
             }
         } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun logout(): Result<Boolean> {
+        return try {
+            val response = client.post("https://cc.project-on.net:30010/api/cc/v1/Logout") {
+                header("Authorization", "Bearer ${settings.getToken()}")
+                contentType(ContentType.Application.Json)
+            }
+            if (response.status == HttpStatusCode.OK) {
+                settings.setToken(null)
+                Result.success(true)
+            } else {
+                Result.failure(Exception( "Failed to logout."))
+            }
+        }catch (e: Exception) {
             Result.failure(e)
         }
     }
